@@ -15,9 +15,29 @@ app.get('/status',function(req,resp){
 
 // Create S3 bucket
 app.post('/s3CreateBucket/:bucket',function(req,resp){
-    console.log('s3Create called with ',req.params.bucket);
-    var bucket = req.params.bucket + uuid();
-    console.log('s3 bucket created - ',bucket);
+    console.log('s3CreateBucket called with ',req.params.bucket);
+    var bucket = req.params.bucket + '-' + uuid();
+    s3.createBucket(
+        {Bucket: bucket},
+        function(err,data){
+            if (err) {
+                console.log('Error - ',err);
+            } else {
+                console.log('s3 bucket created - ',bucket);
+            }
+        }
+    );
+    resp.end('Create bucket called');
+})
+// List s3 buckets
+app.get('/s3List',function(req,resp){
+    console.log('s3List called');
+    s3.listBuckets(
+      function(err,data){
+          console.log(data);
+          resp.end('Buckets: ' + '\n'  + console.log(data));
+      }  
+    )
 })
 
 // Store data in s3
@@ -60,4 +80,4 @@ app.delete('s3Delete/:id',function(req,resp){
 })
 
 // Start web server
-app.listen(8080);
+app.listen(8081);

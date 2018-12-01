@@ -1,0 +1,16 @@
+{
+    "name": "s3experiment",
+    "version": "0.1.0",
+    "description": "App to create, retrieve and delete objects from s3 bucket",
+    "license": "MIT",
+    "dependencies": {
+        "aws-sdk": "2.3.x",
+        "express": "4.x",
+        "serverless": "^1.33.2",
+        "serverless-offline": "^3.31.3",
+        "uuid": "3.3"
+    },
+    "scripts": {
+        "start": "node exp-1.js"
+    }
+}
