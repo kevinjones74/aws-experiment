@@ -6,6 +6,7 @@ var aws = require('aws-sdk'),
 
 var s3 = new aws.S3();
 var app = express();
+var bucket;
 
 // Status endpoint
 app.get('/status',function(req,resp){
@@ -16,7 +17,7 @@ app.get('/status',function(req,resp){
 // Create S3 bucket
 app.post('/s3CreateBucket/:bucket',function(req,resp){
     console.log('s3CreateBucket called with ',req.params.bucket);
-    var bucket = req.params.bucket + '-' + uuid();
+    bucket = req.params.bucket + '-' + uuid();
     s3.createBucket(
         {Bucket: bucket},
         function(err,data){
@@ -27,21 +28,21 @@ app.post('/s3CreateBucket/:bucket',function(req,resp){
             }
         }
     );
-    resp.end('Create bucket called');
+    resp.end('Create bucket called - ' + bucket);
 })
 // List s3 buckets
-app.get('/s3List',function(req,resp){
-    console.log('s3List called');
+app.get('/s3ListBuckets',function(req,resp){
+    console.log('s3ListBucket called');
     s3.listBuckets(
       function(err,data){
           console.log(data);
-          resp.end('Buckets: ' + '\n'  + console.log(data));
+          resp.end('Buckets: ' + '\n'  + JSON.stringify(data));
       }  
     )
 })
 
 // Store data in s3
-app.post('/s3Create/:id',function(req,resp){
+app.post('/s3CreateObject/:id',function(req,resp){
     console.log('s3Create called with ',req.params.id);
     s3.putObject(
         {Bucket: bucket,
@@ -50,12 +51,12 @@ app.post('/s3Create/:id',function(req,resp){
         Matadata:{test_label:'test_value'}
         }
     );
-    resp.end('Create s3 object: ' + request.params.id);
+    resp.end('Create s3 object: ' + req.params.id);
 })
 
 // Retrieve data from s3 bucket
-app.get('/s3Retrieve/:id',function(req,resp){
-    console.log('s3Retrieve called with ',req.params.id);
+app.get('/s3RetrieveObject/:id',function(req,resp){
+    console.log('s3RetrieveObject called with ',req.params.id);
     s3.getObject(
       {Bucket: bucket,
       Key: id},
@@ -67,8 +68,8 @@ app.get('/s3Retrieve/:id',function(req,resp){
 })
 
 // Delete data from s3
-app.delete('s3Delete/:id',function(req,resp){
-    console.log('s3Delete called with ',req.params.id);
+app.delete('s3DeleteObject/:id',function(req,resp){
+    console.log('s3DeleteObject called with ',req.params.id);
     s3.deletetObject(
       {Bucket: bucket,
       Key: id},
@@ -79,5 +80,16 @@ app.delete('s3Delete/:id',function(req,resp){
     ) 
 })
 
+// List data objectsfrom s3
+app.get('s3ListObject',function(req,resp){
+    console.log('s3ListObject called');
+    s3.listObject(
+      {Bucket: bucket},
+      function(err,data){
+          console.log(JSON.stringify(data));
+          resp.end('Listed data from Bucket: ' + bucket +'\n' + 'Key: ' + id +'\n' + 'Data: ' +JSON.stringify(data));
+      }  
+    ) 
+})
 // Start web server
 app.listen(8081);
